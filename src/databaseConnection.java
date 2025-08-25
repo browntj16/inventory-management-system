@@ -27,12 +27,14 @@ public class databaseConnection {
     /**
      * connects to db using username and password
      */
-    public void connectToDb(){
+    public boolean connectToDb(){
         try{
             this.c = DriverManager.getConnection(url, userName, password);
+            return true;
         }
         catch(SQLException e){
             System.err.println("SQL Error: " + e.getMessage());
+            return false;
         }
 
     }
@@ -41,29 +43,19 @@ public class databaseConnection {
      * executes passed in query
      * @param query
      */
-    public ResultSet executeQuery(String query){
-        try {
+    public ResultSet executeQuery(String query) throws SQLException {
             //PreparedStatement p = c.prepareStatement(query);
             Statement st = c.createStatement();
             return st.executeQuery(query);
             //st.close();
             //rs.close();
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            return null;
-        }
         }
 
-    public int executeUpdate(String query){
-        try {
+    public int executeUpdate(String query) throws SQLException {
             Statement st = c.createStatement();
             int count = st.executeUpdate(query);
             st.close();
             return count;
-        } catch (SQLException e) {
-            System.err.println("SQL Error: " + e.getMessage());
-            return 0;
-        }
     }
 
     /**
