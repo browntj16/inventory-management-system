@@ -41,17 +41,30 @@ public class databaseConnection {
      * executes passed in query
      * @param query
      */
-    public void executeQuery(String query){
+    public ResultSet executeQuery(String query){
         try {
+            //PreparedStatement p = c.prepareStatement(query);
             Statement st = c.createStatement();
-            st.executeUpdate(query);
-            st.close();
-            System.out.println(
-                    "Finished!");
+            return st.executeQuery(query);
+            //st.close();
+            //rs.close();
         } catch (SQLException e) {
             System.err.println("SQL Error: " + e.getMessage());
+            return null;
         }
         }
+
+    public int executeUpdate(String query){
+        try {
+            Statement st = c.createStatement();
+            int count = st.executeUpdate(query);
+            st.close();
+            return count;
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+            return 0;
+        }
+    }
 
     /**
      * closes connection with the db
