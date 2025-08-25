@@ -5,18 +5,18 @@ public class invManager {
     databaseConnection c;
     String tableName;
     public void addToInventory(String upc, String name, int quantity){
-        ResultSet rs = c.executeQuery("SELECT * FROM " + tableName + " WHERE upc=" + upc);
         int rowsAffected = 0;
         try{
+            ResultSet rs = c.executeQuery("SELECT * FROM " + tableName + " WHERE upc=" + upc);
             if(rs.next()){ // if we found anything
                 int db_quantity = rs.getInt("quantity");
-                rowsAffected = c.executeUpdate("UPDATE sys.inventory SET quantity=" + (db_quantity+quantity) +
+                rowsAffected = c.executeUpdate("UPDATE" + tableName  + " SET quantity=" + (db_quantity+quantity) +
                         ", name=" + name +
                         " WHERE upc="+upc);
                 // update row to have new quantity + old quantity
             }
             else{
-                rowsAffected = c.executeUpdate("INSERT INTO sys.inventory (upc, name, quantity) VALUES(" + upc + "," +
+                rowsAffected = c.executeUpdate("INSERT INTO " + tableName + " (upc, name, quantity) VALUES(" + upc + "," +
                         name + "," + quantity + ")");
                 //if row was not found, we simply can insert it
             }
@@ -29,19 +29,19 @@ public class invManager {
 
 
     }
-    //@override
+    //overload
     public void addToInventory(String upc, int quantity){
         int rowsAffected = 0;
-        ResultSet rs = c.executeQuery("SELECT * FROM " + tableName + " WHERE upc=" + upc);
         try{
+            ResultSet rs = c.executeQuery("SELECT * FROM " + tableName + " WHERE upc=" + upc);
             if(rs.next()){ // if we found anything
                 int db_quantity = rs.getInt("quantity");
                 System.out.println("Quantity: " + db_quantity);
-                rowsAffected = c.executeUpdate("UPDATE sys.inventory SET quantity=" + (db_quantity+quantity) + "WHERE upc="+upc);
+                rowsAffected = c.executeUpdate("UPDATE " + tableName +" SET quantity=" + (db_quantity+quantity) + "WHERE upc="+upc);
                 // update row to have new quantity + old quantity
             }
             else{
-                rowsAffected = c.executeUpdate("INSERT INTO sys.inventory (upc, quantity) VALUES(" + upc + "," + quantity + ")");
+                rowsAffected = c.executeUpdate("INSERT INTO " + tableName + " (upc, quantity) VALUES(" + upc + "," + quantity + ")");
                 //if row was not found, we simply can insert it
             }
         }
@@ -52,9 +52,9 @@ public class invManager {
 
     }
     public void removeFromInventory(String upc, int quantity){
-        ResultSet rs = c.executeQuery("SELECT * FROM " + tableName + " WHERE upc=" + upc);
         int rowsAffected = 0;
         try{
+            ResultSet rs = c.executeQuery("SELECT * FROM " + tableName + " WHERE upc=" + upc);
             if(rs.next()){
                 int db_quantity = rs.getInt("quantity");
                 if(quantity>db_quantity){
@@ -62,10 +62,10 @@ public class invManager {
                             "Removing " + quantity + " of item would result in negative quantity.");
                 }
                 else if(quantity==db_quantity){
-                    rowsAffected = c.executeUpdate("DELETE FROM sys.inventory WHERE upc=" + upc);
+                    rowsAffected = c.executeUpdate("DELETE FROM " + tableName + " WHERE upc=" + upc);
                 }
                 else{
-                    rowsAffected = c.executeUpdate("UPDATE sys.inventory SET quantity=" + (db_quantity - quantity) + "WHERE upc="+upc);
+                    rowsAffected = c.executeUpdate("UPDATE " + tableName + " SET quantity=" + (db_quantity - quantity) + "WHERE upc="+upc);
                 }
             }
             else{
@@ -76,6 +76,39 @@ public class invManager {
             System.err.println("SQL Error: "  + e.getMessage());
         }
         System.out.println(rowsAffected + " row(s) affected.");
+    }
+    //overload
+    public void removeFromInventory(String upc){
+        int rowsAffected = 0;
+        try{
+            ResultSet rs = c.executeQuery("SELECT * FROM " + tableName + " WHERE upc=" + upc);
+            if(rs.next()){
+                rowsAffected = c.executeUpdate("DELETE FROM " + tableName + " WHERE upc=" + upc);
+            }
+            else{
+                System.out.println("No item found with that UPC number!");
+            }
+        }
+        catch (SQLException e){
+            System.err.println("SQL Error: "  + e.getMessage());
+        }
+        System.out.println(rowsAffected + " row(s) affected.");
+    }
+
+    public void showTable(){
+        try{
+            ResultSet rs = c.executeQuery("SELECT * FROM " + tableName);
+            System.out.println("upc\t\tname\t\tquantity");
+            while(rs.next()){
+                System.out.println(rs.getString("upc") + "\t\t" +
+                                rs.getString("name") + "\t\t" +
+                        rs.getInt("quantity"));
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error: " + e.getMessage());
+        }
+
+
     }
     public invManager(databaseConnection c, String tableName){
         this.c = c;
