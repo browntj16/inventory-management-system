@@ -1,9 +1,19 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * invManager is a class that uses a databaseConnection object and a tableName to execute basic commands on our inventory table.
+ */
 public class invManager {
     databaseConnection c;
     String tableName;
+
+    /**
+     * adds item to table using upc, name, and quantity
+     * @param upc
+     * @param name
+     * @param quantity
+     */
     public void addToInventory(String upc, String name, int quantity){
         int rowsAffected = 0;
         try{
@@ -20,6 +30,7 @@ public class invManager {
                         name + "," + quantity + ")");
                 //if row was not found, we simply can insert it
             }
+            //rs.close();
             System.out.println(rowsAffected + " row(s) affected.");
         }
         catch (SQLException e){
@@ -29,7 +40,12 @@ public class invManager {
 
 
     }
-    //overload
+
+    /**
+     * overloaded function. takes only the upc and quantity and adds to inventory.
+     * @param upc
+     * @param quantity
+     */
     public void addToInventory(String upc, int quantity){
         int rowsAffected = 0;
         try{
@@ -51,6 +67,12 @@ public class invManager {
         System.out.println(rowsAffected + " row(s) affected. ");
 
     }
+
+    /**
+     * removes quantity of item from inventory
+     * @param upc
+     * @param quantity
+     */
     public void removeFromInventory(String upc, int quantity){
         int rowsAffected = 0;
         try{
@@ -77,7 +99,11 @@ public class invManager {
         }
         System.out.println(rowsAffected + " row(s) affected.");
     }
-    //overload
+
+    /**
+     * overload of above function. removes all of a row from inventory.
+     * @param upc
+     */
     public void removeFromInventory(String upc){
         int rowsAffected = 0;
         try{
@@ -95,6 +121,9 @@ public class invManager {
         System.out.println(rowsAffected + " row(s) affected.");
     }
 
+    /**
+     * displays entire table in console
+     */
     public void showTable(){
         try{
             ResultSet rs = c.executeQuery("SELECT * FROM " + tableName);
